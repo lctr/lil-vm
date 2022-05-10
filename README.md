@@ -1,3 +1,5 @@
 # A lil' virtual machine
 
-Building a VM in rust, loosely based off of [this tutorial](https://blog.subnetzero.io/post/building-language-vm-part-01/).
+Building a register-based VM in Rust, loosely based off of [this
+tutorial](https://blog.subnetzero.io/post/building-language-vm-part-01/) in an
+educational quest to Understand Compilation.
