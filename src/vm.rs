@@ -1,7 +1,7 @@
 ///! NOTE: THE MACHINE IN WHICH THIS WAS WRITTEN USES BIG ENDIAN!!!!!!
 ///
 /// Todo: maybe figure something out abt this later idk
-use crate::instrs::OpCode;
+use crate::bytecode::OpCode;
 
 #[derive(Debug)]
 pub struct Vm {
@@ -218,6 +218,7 @@ impl Vm {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 

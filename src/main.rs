@@ -1,4 +1,4 @@
-pub mod instrs;
+pub mod bytecode;
 pub mod vm;
 
 fn main() {
