@@ -6,11 +6,11 @@ use crate::bytecode::OpCode;
 #[derive(Debug)]
 pub struct Vm {
     /// simulated hardware 32 registers
-    regs: [i32; 32],
+    pub(crate) regs: [i32; 32],
     /// program counter tracks which byte is being executed
     pc: usize,
     /// program bytecode being run
-    code: Vec<u8>,
+    pub code: Vec<u8>,
     /// special register holding the result (remainder) for the last division
     /// operation. since register values are already signed, we don't need to
     /// carry sign information on the remainder
@@ -30,9 +30,17 @@ impl Vm {
         }
     }
 
+    pub fn instructions(&self) -> &[u8] {
+        self.code.as_slice()
+    }
+
     #[inline]
     fn is_done(&self) -> bool {
         self.pc >= self.code.len()
+    }
+
+    pub fn add_byte(&mut self, byte: u8) {
+        self.code.push(byte);
     }
 
     /// Execute one instruction, as opposed to running all instructions in the
@@ -171,8 +179,9 @@ impl Vm {
                     self.next_8_bits();
                 }
                 OpCode::GreaterEq => {
-                    let r1 = self.regs[self.next_8_bits() as usize];
-                    let r2 = self.regs[self.next_8_bits() as usize];
+                    let [r1, r2] = self.fetch_reg_chunk();
+                    // let r1 = self.regs[self.next_8_bits() as usize];
+                    // let r2 = self.regs[self.next_8_bits() as usize];
                     // update the special comparison register to hold the result
                     self.cmp = r1 >= r2;
                     // then proceed with the next 8 bits?
@@ -193,6 +202,13 @@ impl Vm {
                         self.pc = dest as usize
                     }
                 }
+                OpCode::JumpNeq => {
+                    let reg = self.next_8_bits() as usize;
+                    let dest = self.regs[reg];
+                    if !self.cmp {
+                        self.pc = dest as usize
+                    }
+                }
             };
         }
         self.pc >= self.code.len()
@@ -208,6 +224,16 @@ impl Vm {
         let byte = self.code[self.pc];
         self.pc += 1;
         byte
+    }
+
+    /// Returns an array of values held by the registers addressed in the next
+    /// `N` chunks of bytecode.
+    fn fetch_reg_chunk<const N: usize>(&mut self) -> [i32; N] {
+        let mut chunk = [0; N];
+        for i in 0..N {
+            chunk[i] = self.regs[self.next_8_bits() as usize];
+        }
+        chunk
     }
 
     fn next_16_bits(&mut self) -> u16 {
