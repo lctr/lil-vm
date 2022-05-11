@@ -1,6 +1,9 @@
+pub mod assembler;
 pub mod bytecode;
+pub mod data;
+pub mod repl;
 pub mod vm;
 
 fn main() {
-    println!("Hello, world!");
+    repl::Repl::new().run()
 }
